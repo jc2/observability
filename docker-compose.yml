@@ -1,0 +1,59 @@
+version: "3.9"
+   
+services:
+  service_a:
+    build: .
+    image: juancamiloceron/observability_service
+    container_name: service_a
+    environment:
+      - name=service_a
+    ports:
+      - "5000:5000"
+  service_aa:
+    build: .
+    image: juancamiloceron/observability_service
+    container_name: service_aa
+    environment:
+      - name=service_aa
+  service_ab:
+    build: .
+    image: juancamiloceron/observability_service
+    container_name: service_ab
+    environment:
+      - name=service_ab
+  service_aba:
+    build: .
+    image: juancamiloceron/observability_service
+    container_name: service_aba
+    environment:
+      - name=service_aba
+  service_abb:
+    build: .
+    image: juancamiloceron/observability_service
+    container_name: service_abb
+    environment:
+      - name=service_abb
+  service_abaa:
+    build: .
+    image: juancamiloceron/observability_service
+    container_name: service_abaa
+    environment:
+      - name=service_abaa
+  service_ac:
+    build: .
+    image: juancamiloceron/observability_service
+    container_name: service_ac
+    environment:
+      - name=service_ac
+  service_aca:
+    build: .
+    image: juancamiloceron/observability_service
+    container_name: service_aca
+    environment:
+      - name=service_aca
+  service_acb:
+    build: .
+    image: juancamiloceron/observability_service
+    container_name: service_acb
+    environment:
+      - name=service_acb
