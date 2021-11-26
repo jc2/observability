@@ -21,7 +21,7 @@ app = Flask(service)
 
 app.config['ELASTIC_APM'] = {
 'SERVICE_NAME': service,
-'SECRET_TOKEN': 'ywpNsZycLZsuVgpnKY',
+'SECRET_TOKEN': '',
 'SERVER_URL': 'https://87b44754de3b4705b610c9722148f608.apm.eastus2.azure.elastic-cloud.com:443',
 'ENVIRONMENT': 'production',
 }
