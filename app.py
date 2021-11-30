@@ -11,6 +11,8 @@ from elasticapm.contrib.flask import ElasticAPM
 import ecs_logging
 from pythonjsonlogger import jsonlogger
 
+from custom_logger import getStructLogger
+
 
 s = Summary('request_latency_seconds', 'RPS and Response time', ["path", "method"])
 g = Gauge('inprogress_requests', 'In progress requests', ["path", "method"])
@@ -28,17 +30,36 @@ app.config['ELASTIC_APM'] = {
 
 apm = ElasticAPM(app)
 
-logger = logging.getLogger(service)
-logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(f"{service}.log")
-# handler.setFormatter(ecs_logging.StdlibFormatter())
-# handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-handler.setFormatter(jsonlogger.JsonFormatter())
-logger.addHandler(handler)
+logger_py = logging.getLogger(f"{service}_py")
+logger_py.setLevel(logging.DEBUG)
+handler_py = logging.FileHandler(f"{service}_py.log")
+handler_py.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+logger_py.addHandler(handler_py)
+
+logger_ecs = logging.getLogger(f"{service}_ecs")
+logger_ecs.setLevel(logging.DEBUG)
+handler_ecs = logging.FileHandler(f"{service}_ecs.log")
+handler_ecs.setFormatter(ecs_logging.StdlibFormatter())
+logger_ecs.addHandler(handler_ecs)
+
+logger_jf = logging.getLogger(f"{service}_jf")
+logger_jf.setLevel(logging.DEBUG)
+handler_jf = logging.FileHandler(f"{service}_jf.log")
+handler_jf.setFormatter(jsonlogger.JsonFormatter())
+logger_jf.addHandler(handler_jf)
+
+logger_custom = getStructLogger(f"{service}_custom")
+
 
 app.wsgi_app = DispatcherMiddleware(
     app.wsgi_app, {"/metrics": make_wsgi_app()}
 )
+
+def logger(level, msg):
+    getattr(logger_py, level)(f"Logger PY: {msg}")
+    getattr(logger_ecs, level)(msg=f"Logger ECS: {msg}")
+    getattr(logger_jf, level)(msg=f"Logger JF: {msg}")
+    getattr(logger_custom, level)(f"Logger Custom: {msg}")
 
 def alter_rute(f):
     def wrapper(*args, **kwargs):
@@ -46,10 +67,10 @@ def alter_rute(f):
             with s.labels(request.path, request.method).time():
                 sleep(randint(0,100)/100)
                 if randint(0, 30) == 5:
-                    logger.error("BOOM")
+                    logger(level="error", msg="BOOM")
                     return jsonify({"Error": "BOOM"}), 500
                 a = f(*args, **kwargs)
-                logger.info(msg=str(a.get_json()))
+                logger(level="info", msg=str(a.get_json()))
         return a
     wrapper.__name__ = f.__name__
     return wrapper
@@ -99,7 +120,7 @@ def index():
     
 
 def do_call(url):
-    logger.debug(msg=f"Calling {url}")
+    logger(level="debug", msg=f"Calling {url}")
     response = requests.post(url)
     response.raise_for_status()
     return response.json()
@@ -109,5 +130,5 @@ def do_something():
 
 @app.errorhandler(Exception)
 def handle_bad_request(e):
-    logger.error(msg=f"ERROR: {e}")
+    logger(level="error", msg=f"ERROR: {e}")
     return f'Error {e}', 500

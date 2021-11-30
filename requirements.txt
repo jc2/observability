@@ -4,4 +4,5 @@ requests==2.25.1
 elastic-apm[flask]==6.7.0
 ecs-logging==1.1.0
 python-json-logger==2.0.2
+structlog==21.4.0
 # uWSGI==2.0.20

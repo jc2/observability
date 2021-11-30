@@ -16,5 +16,7 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 COPY app.py /code/
+COPY custom_logger.py /code/
+
 COPY docker-entrypoint.sh /code/
 ENTRYPOINT ["bash","docker-entrypoint.sh"]

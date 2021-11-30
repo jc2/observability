@@ -4,10 +4,12 @@ Change Elastic Credentils in ``filebeat.yml``
 
 Add yout email in the ``alertmanager.yml`` file
 
+``flask run``
+
 ``docker build -t <image_name> .``
 
 ``docker-compose up``
 
-``docker-compose down``
+``curl --location --request POST 'http://127.0.0.1:5000/'``
 
-``docker run -p 9090:9090 -v $PWD/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus``
+``docker-compose down``
