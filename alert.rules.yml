@@ -1,0 +1,11 @@
+groups:
+- name: alert.rules
+  rules:
+  - alert: LatencyHigh
+    expr: rate(request_latency_seconds_count[1m]) > 0.5
+    for: 10s
+    labels:
+      severity: "critical"
+    annotations:
+      summary: "Endpoint {{ $labels.instance }} in {{ $labels.path }} has high latency"
+      description: "{{ $labels.instance }} with path {{ $labels.path }} has high latency"

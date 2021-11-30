@@ -1,0 +1,19 @@
+global:
+  smtp_from: "admin@superemail.com"
+  smtp_smarthost: "mail:25"
+  smtp_require_tls: false
+route:
+  group_by: ['alertname']
+  group_wait: 3s
+  group_interval: 5s
+  repeat_interval: 1h
+  receiver: 'admins'
+  routes:
+    - match:
+        severity: critical
+      receiver: admins
+receivers:
+- name: 'admins'
+  email_configs:
+    - to: '<email>'
+      send_resolved: true

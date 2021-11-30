@@ -4,6 +4,14 @@ scrape_configs:
     scrape_interval: 1s
 
     static_configs:
-      - targets: ['172.19.7.82:5000', '172.19.7.82:5001']
+      - targets: ['service_a:5000', 'service_aa:5000', 'service_ab:5000', 'service_ac:5000', 'service_aba:5000', 'service_abaa:5000', 'service_aca:5000', 'service_acb:5000']
         labels:
           group: 'dev'
+
+rule_files:
+  - alert.rules.yml
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      - 'alertmanager:9093'

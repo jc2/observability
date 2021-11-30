@@ -1,6 +1,8 @@
 Work in progress
 
-Change Elastic Credentils in filebeat.yml
+Change Elastic Credentils in ``filebeat.yml``
+
+Add yout email in the ``alertmanager.yml`` file
 
 ``docker build -t <image_name> .``
 
