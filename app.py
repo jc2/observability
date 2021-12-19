@@ -1,9 +1,7 @@
-import math
 import os
 from random import randint
 from time import sleep
 import logging
-import datetime
 
 from flask import Flask, jsonify, request
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
@@ -27,7 +25,7 @@ app = Flask(service)
 app.config['ELASTIC_APM'] = {
 'SERVICE_NAME': service,
 'SECRET_TOKEN': '',
-'SERVER_URL': 'https://87b44754de3b4705b610c9722148f608.apm.eastus2.azure.elastic-cloud.com:443',
+'SERVER_URL': 'http://elastic:changeme@apm-server:8200',
 'ENVIRONMENT': 'production',
 }
 
@@ -97,10 +95,12 @@ def runtime_logging(f):
 @alter_rute
 def index():
     if service == "service_a":
-        ra = do_call("http://service_aa:5000/")
+        #ra = do_call("http://service_aa:5000/")
         da = do_something()
         rb = do_call("http://service_ab:5000/")
-        rc = do_call("http://service_ac:5000/")
+        #rc = do_call("http://service_ac:5000/")
+        ra = None
+        rc = None
         return jsonify({"service": service, "flow": f"{ra}, {da}, {rb}, {rc}"})
     elif service == "service_aa":
         da = do_something()
@@ -121,6 +121,7 @@ def index():
         return jsonify({"service": service, "flow": f"{ra}, {da}"})
     elif service == "service_abb":
         da = do_something()
+        db = do_redis()
         return jsonify({"service": service, "flow": f"{da}"})
     elif service == "service_aca":
         da = do_something()
@@ -142,6 +143,12 @@ def do_call(url):
     response = requests.post(url)
     response.raise_for_status()
     return response.json()
+
+def do_redis():
+    import redis
+    r = redis.Redis(host='redis_abb', port=6379, db=0, password="1234")
+    r.set('foo', 'bar')
+    return r.get('foo')
 
 @capture_span()
 @runtime_logging

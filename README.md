@@ -1,5 +1,9 @@
 Work in progress
 
+Run elastic with:
+``https://github.com/jc2/docker-elk``
+``docker-compose -f docker-compose.yml -f extensions/apm-server/apm-server-compose.yml up``
+
 Change Elastic Credentils in ``filebeat.yml``
 
 Add yout email in the ``alertmanager.yml`` file
