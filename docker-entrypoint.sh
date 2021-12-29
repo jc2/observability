@@ -1,9 +1,9 @@
 #!/bin/bash
 
 echo "Running Filebeat"
-# filebeat setup --modules=apache --pipelines
-# service filebeat start
-# service filebeat status
+filebeat setup --modules=apache --pipelines
+service filebeat start
+service filebeat status
 
 echo "starting Servvice"
 flask run --host 0.0.0.0 --port 5000

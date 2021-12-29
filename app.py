@@ -27,7 +27,9 @@ app.config['ELASTIC_APM'] = {
 'SECRET_TOKEN': '',
 'SERVER_URL': 'http://elastic:changeme@apm-server:8200',
 'ENVIRONMENT': 'production',
+'USE_ELASTIC_EXCEPTHOOK': True,
 }
+
 
 apm = ElasticAPM(app)
 
@@ -57,23 +59,24 @@ app.wsgi_app = DispatcherMiddleware(
 )
 
 def logger(level, msg):
-    getattr(logger_py, level)(f"Logger PY: {msg}")
+    # getattr(logger_py, level)(f"Logger PY: {msg}")
     getattr(logger_ecs, level)(msg=f"Logger ECS: {msg}")
-    getattr(logger_jf, level)(msg=f"Logger JF: {msg}")
-    getattr(logger_custom, level)(f"Logger Custom: {msg}")
+    # getattr(logger_jf, level)(msg=f"Logger JF: {msg}")
+    # getattr(logger_custom, level)(f"Logger Custom: {msg}")
 
 def alter_rute(f):
     def wrapper(*args, **kwargs):
         with g.labels(request.path, request.method).track_inprogress():
             with s.labels(request.path, request.method).time():
                 sleep(randint(0,100)/100)
-                if randint(0, 30) == 0:
-                    try:
-                        1/0
-                    except ZeroDivisionError:
-                        apm.capture_exception()
-                        logger(level="error", msg="BOOM")
-                    return jsonify({"Error": "BOOM"}), (500 + randint(0,4))
+                if randint(0, 15) == 0:
+                    1/0
+                    # try:
+                    #     1/0
+                    # except ZeroDivisionError:
+                    #     # apm.capture_exception()
+                    #     logger(level="error", msg="BOOM")
+                    # return jsonify({"Error": "BOOM"}), (500 + randint(0,4))
                 a = f(*args, **kwargs)
                 logger(level="info", msg=str(a.get_json()))
         return a
@@ -95,12 +98,10 @@ def runtime_logging(f):
 @alter_rute
 def index():
     if service == "service_a":
-        #ra = do_call("http://service_aa:5000/")
+        ra = do_call("http://service_aa:5000/")
         da = do_something()
         rb = do_call("http://service_ab:5000/")
-        #rc = do_call("http://service_ac:5000/")
-        ra = None
-        rc = None
+        rc = do_call("http://service_ac:5000/")
         return jsonify({"service": service, "flow": f"{ra}, {da}, {rb}, {rc}"})
     elif service == "service_aa":
         da = do_something()
@@ -173,7 +174,8 @@ def fact_recursion(num):
     return num * fact_recursion(num - 1)
 @capture_span()
 def fact_loop(num):
-    apm.capture_message('Doing fact in loop mode')
+    # Logs an error
+    # apm.capture_message('Doing fact in loop mode')
     if num < 0:
         return 0
     if num == 0:
@@ -185,7 +187,7 @@ def fact_loop(num):
     return factorial
 
 
-@app.errorhandler(Exception)
-def handle_bad_request(e):
-    logger(level="exception", msg=f"EXCEPTION: {e}")
-    return jsonify({"error": str(e)}), 500
+# @app.errorhandler(Exception)
+# def handle_bad_request(e):
+#     logger(level="exception", msg=f"EXCEPTION: {e}")
+#     return jsonify({"error": str(e)}), 500
